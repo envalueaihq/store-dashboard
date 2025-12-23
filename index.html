@@ -539,6 +539,116 @@
     font-weight: 700;
 }
 
+/* ===== 탭 메뉴 스타일 ===== */
+.dashboard-tabs {
+    display: flex;
+    gap: 8px;
+    padding: 16px 40px 0;
+    background: rgba(255,255,255,0.72);
+    backdrop-filter: saturate(180%) blur(20px);
+    position: sticky;
+    top: 64px;
+    z-index: 999;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+
+.tab-button {
+    padding: 12px 28px;
+    background: transparent;
+    border: none;
+    border-radius: 8px 8px 0 0;
+    font-size: 15px;
+    font-weight: 500;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.tab-button:hover {
+    background: rgba(0,113,227,0.08);
+    color: #0071e3;
+}
+
+.tab-button.active {
+    background: #ffffff;
+    color: #0071e3;
+    font-weight: 600;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
+}
+
+.tab-button.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: #0071e3;
+}
+
+/* ===== 수당 테이블 스타일 ===== */
+.allowance-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    background: white;
+}
+
+.allowance-table thead {
+    background: linear-gradient(135deg, #1d1d1f 0%, #2c2c2e 100%);
+    color: white;
+}
+
+.allowance-table th {
+    padding: 14px 12px;
+    text-align: center;
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    white-space: nowrap;
+}
+
+.allowance-table tbody tr {
+    transition: all 0.2s ease;
+    background: white;
+}
+
+.allowance-table tbody tr:hover {
+    background: #f8f9fa;
+}
+
+.allowance-table td {
+    padding: 12px 10px;
+    text-align: right;
+    border: 1px solid #e8e8e8;
+    color: #333;
+}
+
+.allowance-table td.product-name {
+    text-align: left;
+    font-weight: 600;
+    color: #1d1d1f;
+}
+
+.allowance-table td.total-row {
+    background: #f5f5f7;
+    font-weight: 700;
+    color: #1d1d1f;
+}
+
+.amount-positive {
+    color: #34c759;
+    font-weight: 600;
+}
+
+.amount-negative {
+    color: #ff3b30;
+    font-weight: 600;
+}
+
+.amount-zero {
+    color: #999;
+}
     </style>
 </head>
 <body>
@@ -561,28 +671,46 @@
         </div>
     </div>
     
-    <div class="container" id="dashboardContent" style="display: none;">
-        <!-- AI 피드백 카드 -->
+<!-- 탭 메뉴 추가 -->
+<div class="dashboard-tabs" id="dashboardTabs" style="display: none;">
+    <button class="tab-button active" onclick="switchTab('performance')">
+        📊 지점 실적
+    </button>
+    <button class="tab-button" onclick="switchTab('allowance')">
+        💰 지점 수당
+    </button>
+</div>
+
+<div class="container" id="dashboardContent" style="display: none;">
+    <!-- 실적 대시보드 (기존 내용) -->
+    <div id="performanceTab">
         <div class="ai-feedback-card" id="aiFeedbackCard"></div>
-        
-        <!-- 평가현황 카드 (NEW!) ✅ -->
         <div class="card" id="evaluationCard"></div>
-        
-        <!-- 평가그룹 순위표 (NEW!) ✅ -->
         <div class="card" id="groupRankingsCard"></div>
-        
-        <!-- Gross 실적 -->
         <div class="card" id="grossCard"></div>
-        
-        <!-- 경쟁력 M/S -->
         <div class="card" id="competitionCard"></div>
-        
-        <!-- M&B 제품 (4개) -->
         <div id="mbCards"></div>
-        
-        <!-- 구독 실적 -->
         <div class="card" id="subscriptionCard"></div>
+    </div>
+    
+    <!-- 매니저 수당 탭 (신규) -->
+    <div id="allowanceTab" style="display: none;">
+        <!-- 수당 요약 카드 -->
+        <div class="card" id="allowanceSummaryCard"></div>
         
+        <!-- 일시불 수당 -->
+        <div class="card" id="lumpsumAllowanceCard"></div>
+        
+        <!-- 구독 수당 -->
+        <div class="card" id="subscriptionAllowanceCard"></div>
+        
+        <!-- 컨테스트 Grade -->
+        <div class="card" id="contestGradeCard"></div>
+        
+        <!-- 컨테스트 집중제품 -->
+        <div class="card" id="contestFocusCard"></div>
+    </div>
+</div>        
     
     <script>
         const LOGIN_DATA = [{"id": "2102268", "name": "안병덕", "branch": "이앤밸류", "permission": "executive"}, {"id": "1901075", "name": "안대석", "branch": "이앤밸류", "permission": "executive"}, {"id": "1027106", "name": "염태석", "branch": "이앤밸류", "permission": "executive"}, {"id": "1000081", "name": "이윤덕", "branch": "이앤밸류", "permission": "executive"}, {"id": "1108733", "name": "이성철", "branch": "이앤밸류", "permission": "executive"}, {"id": "1901074", "name": "이재우", "branch": "이앤밸류", "permission": "executive"}, {"id": "1000200", "name": "김용진", "branch": "이앤밸류", "permission": "executive"}, {"id": "2102284", "name": "한효녕", "branch": "이앤밸류", "permission": "director"}, {"id": "1037362", "name": "변지선", "branch": "이앤밸류", "permission": "director"}, {"id": "2302989", "name": "양지원", "branch": "이앤밸류", "permission": "director"}, {"id": "1096127", "name": "정은현", "branch": "이앤밸류", "permission": "director"}, {"id": "2102267", "name": "이수진", "branch": "이앤밸류", "permission": "director"}, {"id": "2202951", "name": "김민수", "branch": "이앤밸류", "permission": "director"}, {"id": "1100594", "name": "전재성", "branch": "이앤밸류", "permission": "director"}, {"id": "2002144", "name": "최호영", "branch": "이앤밸류", "permission": "director"}, {"id": "1050467", "name": "육민수", "branch": "이앤밸류", "permission": "director"}, {"id": "2202828", "name": "이가영", "branch": "이앤밸류", "permission": "director"}, {"id": "2503318", "name": "박정은", "branch": "이앤밸류", "permission": "director"}, {"id": "2102310", "name": "홍성원", "branch": "이앤밸류", "permission": "director"}, {"id": "2202666", "name": "서소혜", "branch": "이앤밸류", "permission": "director"}, {"id": "1108107", "name": "김다한님", "branch": "이앤밸류", "permission": "director"}, {"id": "2202932", "name": "김혜인", "branch": "이앤밸류", "permission": "director"}, {"id": "1044496", "name": "이길진", "branch": "이앤밸류", "permission": "director"}, {"id": "1030586", "name": "성치경", "branch": "이앤밸류", "permission": "director"}, {"id": "1800391", "name": "배은상", "branch": "이앤밸류", "permission": "director"}, {"id": "2303181", "name": "권도형", "branch": "이앤밸류", "permission": "director"}, {"id": "2102291", "name": "임이슬", "branch": "이앤밸류", "permission": "director"}, {"id": "1071769", "name": "김형진", "branch": "이앤밸류", "permission": "director"}, {"id": "1106784", "name": "강희천", "branch": "이앤밸류", "permission": "director"}, {"id": "1065298", "name": "손영길", "branch": "이앤밸류", "permission": "director"}, {"id": "1064262", "name": "강성희", "branch": "이앤밸류", "permission": "director"}, {"id": "1044107", "name": "임혁", "branch": "이앤밸류", "permission": "director"}, {"id": "1098961", "name": "우현호", "branch": "이앤밸류", "permission": "director"}, {"id": "1106002", "name": "양진철", "branch": "이앤밸류", "permission": "director"}, {"id": "1095062", "name": "배지우", "branch": "이앤밸류", "permission": "director"}, {"id": "1002030", "name": "김경구", "branch": "이앤밸류", "permission": "director"}, {"id": "1000125", "name": "정민철", "branch": "이앤밸류", "permission": "director"}, {"id": "1073466", "name": "박귀복", "branch": "이앤밸류", "permission": "director"}, {"id": "1010911", "name": "민홍기", "branch": "이앤밸류", "permission": "director"}, {"id": "1051850", "name": "김찬기", "branch": "이앤밸류", "permission": "director"}, {"id": "1016431", "name": "김승권", "branch": "이앤밸류", "permission": "director"}, {"id": "1091017", "name": "이인범", "branch": "이앤밸류", "permission": "director"}, {"id": "1018793", "name": "이광환", "branch": "이앤밸류", "permission": "director"}, {"id": "1048654", "name": "이현철", "branch": "이앤밸류", "permission": "director"}, {"id": "1053415", "name": "김형진", "branch": "이앤밸류", "permission": "director"}, {"id": "1029189", "name": "김이준", "branch": "이앤밸류", "permission": "director"}, {"id": "1094421", "name": "황용승", "branch": "이앤밸류", "permission": "director"}, {"id": "1002429", "name": "이찬민", "branch": "이앤밸류", "permission": "director"}, {"id": "1011687", "name": "김면찬", "branch": "이앤밸류", "permission": "director"}, {"id": "1100157", "name": "한영규", "branch": "이앤밸류", "permission": "director"}, {"id": "1069595", "name": "이세진", "branch": "이앤밸류", "permission": "director"}, {"id": "1105449", "name": "손호익", "branch": "이앤밸류", "permission": "director"}, {"id": "1070851", "name": "홍상곤", "branch": "이앤밸류", "permission": "director"}, {"id": "1058374", "name": "이창수", "branch": "이앤밸류", "permission": "director"}, {"id": "1000811", "name": "강유승", "branch": "이앤밸류", "permission": "director"}, {"id": "1000906", "name": "김만석", "branch": "이앤밸류", "permission": "director"}, {"id": "2001793", "name": "금민철", "branch": "이앤밸류", "permission": "director"}, {"id": "1105361", "name": "이장규", "branch": "이앤밸류", "permission": "director"}, {"id": "1800454", "name": "정유학", "branch": "이앤밸류", "permission": "director"}, {"id": "1043847", "name": "박종진", "branch": "이앤밸류", "permission": "director"}, {"id": "1018868", "name": "임길혁", "branch": "이앤밸류", "permission": "director"}, {"id": "1072955", "name": "이재림", "branch": "이앤밸류", "permission": "director"}, {"id": "1901408", "name": "김승찬", "branch": "이앤밸류", "permission": "director"}, {"id": "1103117", "name": "김용석", "branch": "이앤밸류", "permission": "director"}, {"id": "2403265", "name": "김유나", "branch": "이앤밸류", "permission": "director"}, {"id": "1016469", "name": "전황표", "branch": "이앤밸류", "permission": "director"}, {"id": "1064707", "name": "김수영", "branch": "이앤밸류", "permission": "director"}, {"id": "1000665", "name": "정범석", "branch": "이앤밸류", "permission": "director"}, {"id": "1109093", "name": "유성환", "branch": "이앤밸류", "permission": "director"}, {"id": "1000255", "name": "민정동", "branch": "이앤밸류", "permission": "director"}, {"id": "1901470", "name": "황정환", "branch": "이앤밸류", "permission": "director"}, {"id": "1090265", "name": "허재영", "branch": "이앤밸류", "permission": "director"}, {"id": "1060771", "name": "김응섭", "branch": "이앤밸류", "permission": "director"}, {"id": "1012021", "name": "한상영", "branch": "이앤밸류", "permission": "director"}, {"id": "1031331", "name": "김종성", "branch": "이앤밸류", "permission": "director"}, {"id": "1000209", "name": "서종원", "branch": "이앤밸류", "permission": "director"}, {"id": "1098755", "name": "배지윤", "branch": "이앤밸류", "permission": "director"}, {"id": "1073671", "name": "서영현", "branch": "이앤밸류", "permission": "director"}, {"id": "1000937", "name": "박애경", "branch": "전자랜드 죽전점_가전", "permission": "manager"}, {"id": "1050979", "name": "전석우", "branch": "전자랜드 경기광주점", "permission": "manager"}, {"id": "2001729", "name": "안재윤", "branch": "전자랜드 발안점", "permission": "manager"}, {"id": "1016707", "name": "이광우", "branch": "전자랜드 분평점_가전", "permission": "manager"}, {"id": "1091607", "name": "이동화", "branch": "전자랜드 서산점", "permission": "manager"}, {"id": "1106465", "name": "송현석", "branch": "전자랜드 쌍용점_가전", "permission": "manager"}, {"id": "1030393", "name": "김정란", "branch": "전자랜드 아산점_가전", "permission": "manager"}, {"id": "1105120", "name": "남승우", "branch": "전자랜드 안동점_가전", "permission": "manager"}, {"id": "2403199", "name": "김민재", "branch": "전자랜드 안양비산점", "permission": "manager"}, {"id": "1090972", "name": "박동민", "branch": "전자랜드 오광장점_가전", "permission": "manager"}, {"id": "1104383", "name": "김민식", "branch": "전자랜드 오산점", "permission": "manager"}, {"id": "1000928", "name": "정미숙", "branch": "전자랜드 우현점_가전", "permission": "manager"}, {"id": "2102494", "name": "이미나", "branch": "전자랜드 천안메가마트점", "permission": "manager"}, {"id": "1901436", "name": "권구현", "branch": "전자랜드 커넥트현대 청주점", "permission": "manager"}, {"id": "2503363", "name": "김소현", "branch": "전자랜드 평택본점", "permission": "manager"}, {"id": "1037494", "name": "이정권", "branch": "전자랜드 가든파이브점", "permission": "manager"}, {"id": "1900950", "name": "이동근", "branch": "전자랜드 가든파이브점", "permission": "manager"}, {"id": "1105755", "name": "박흥수", "branch": "전자랜드 경기광주점", "permission": "manager"}, {"id": "1099919", "name": "노수환", "branch": "전자랜드 경산점", "permission": "manager"}, {"id": "1046927", "name": "김영일", "branch": "전자랜드 경산점", "permission": "manager"}, {"id": "1067730", "name": "윤희중", "branch": "전자랜드 광평점_가전", "permission": "manager"}, {"id": "1800695", "name": "박병인", "branch": "전자랜드 광평점_가전", "permission": "manager"}, {"id": "1089914", "name": "오병윤", "branch": "전자랜드 김천점", "permission": "manager"}, {"id": "1105058", "name": "우대호", "branch": "전자랜드 김천점", "permission": "manager"}, {"id": "2403271", "name": "박현욱", "branch": "전자랜드 분평점_가전", "permission": "manager"}, {"id": "1069596", "name": "신정희", "branch": "전자랜드 분평점_가전", "permission": "manager"}, {"id": "2503338", "name": "안병석", "branch": "전자랜드 쌍용점_가전", "permission": "manager"}, {"id": "1053751", "name": "신미경", "branch": "전자랜드 쌍용점_가전", "permission": "manager"}, {"id": "2403211", "name": "박현우", "branch": "전자랜드 안동점_가전", "permission": "manager"}, {"id": "1100598", "name": "김학현", "branch": "전자랜드 오광장점_가전", "permission": "manager"}, {"id": "1104090", "name": "박철수", "branch": "전자랜드 오광장점_가전", "permission": "manager"}, {"id": "1800109", "name": "이민재", "branch": "전자랜드 오산점", "permission": "manager"}, {"id": "1104783", "name": "김동혁", "branch": "전자랜드 우현점_가전", "permission": "manager"}, {"id": "2503285", "name": "이승열", "branch": "전자랜드 죽전점_가전", "permission": "manager"}, {"id": "2202897", "name": "유영창", "branch": "전자랜드 죽전점_가전", "permission": "manager"}, {"id": "1800714", "name": "오창렬", "branch": "전자랜드 커넥트현대 청주점", "permission": "manager"}, {"id": "1105540", "name": "이상훈", "branch": "전자랜드 현대시티아울렛 대구점", "permission": "manager"}, {"id": "2503279", "name": "이재욱", "branch": "전자랜드 현대시티아울렛 대구점", "permission": "manager"}, {"id": "2403235", "name": "이선형", "branch": "전자랜드 홍성점", "permission": "manager"}, {"id": "2503367", "name": "박기성", "branch": "(신)이마트 서산점", "permission": "manager"}, {"id": "2503309", "name": "최재원", "branch": "(신)이마트 칠성점", "permission": "manager"}, {"id": "1067689", "name": "김진", "branch": "(신)이마트 E/T구성점", "permission": "manager"}, {"id": "2503332", "name": "김주호", "branch": "(신)이마트 E/T천안아산점", "permission": "manager"}, {"id": "1108710", "name": "나광재", "branch": "(신)이마트 경기광주점", "permission": "manager"}, {"id": "1000024", "name": "박현숙", "branch": "(신)이마트 경기광주점", "permission": "manager"}, {"id": "1000924", "name": "장유선", "branch": "(신)이마트 경산점", "permission": "manager"}, {"id": "1901558", "name": "이진호", "branch": "(신)이마트 명일점", "permission": "manager"}, {"id": "1075150", "name": "조정현", "branch": "(신)이마트 분당점", "permission": "manager"}, {"id": "1800129", "name": "임현미", "branch": "(신)이마트 월배점", "permission": "manager"}, {"id": "2202964", "name": "김신", "branch": "(신)이마트 이동점", "permission": "manager"}, {"id": "1016699", "name": "김태호", "branch": "(신)이마트 죽전점", "permission": "manager"}, {"id": "1800851", "name": "김현재", "branch": "E/T스타필드안성점", "permission": "manager"}, {"id": "2503293", "name": "신효성", "branch": "E/T화서점", "permission": "manager"}, {"id": "1105054", "name": "정영남", "branch": "이마트 E/T군포점", "permission": "manager"}, {"id": "2303051", "name": "권소연", "branch": "일렉트로마트 STF화서", "permission": "manager"}, {"id": "2202803", "name": "윤국현", "branch": "일렉트로마트STF안성", "permission": "manager"}, {"id": "2303042", "name": "강민수", "branch": "(신)이마트 스타필드하남점", "permission": "manager"}, {"id": "1069082", "name": "오영재", "branch": "(신)이마트 죽전점", "permission": "manager"}, {"id": "1049389", "name": "김병찬", "branch": "(신)이마트 E/T구성점", "permission": "manager"}, {"id": "1071710", "name": "임동환", "branch": "(신)이마트 E/T스타필드하남점", "permission": "manager"}, {"id": "1035521", "name": "변재형", "branch": "(신)이마트 고잔점", "permission": "manager"}, {"id": "1072073", "name": "김우중", "branch": "(신)이마트 구미점", "permission": "manager"}, {"id": "1046500", "name": "김기송", "branch": "(신)이마트 동탄점", "permission": "manager"}, {"id": "1035213", "name": "석명걸", "branch": "(신)이마트 만촌점", "permission": "manager"}, {"id": "1019293", "name": "신승호", "branch": "(신)이마트 산본점", "permission": "manager"}, {"id": "1071910", "name": "정광영", "branch": "(신)이마트 서수원점", "permission": "manager"}, {"id": "1096417", "name": "김기영", "branch": "(신)이마트 수원점", "permission": "manager"}, {"id": "1028792", "name": "김병덕", "branch": "(신)이마트 스타필드하남점", "permission": "manager"}, {"id": "1102100", "name": "김희영", "branch": "(신)이마트 월배점", "permission": "manager"}, {"id": "1092164", "name": "조은형", "branch": "(신)이마트 죽전점", "permission": "manager"}, {"id": "1064268", "name": "백승규", "branch": "(신)이마트 천안점", "permission": "manager"}, {"id": "1016705", "name": "배기환", "branch": "(신)이마트 청주점", "permission": "manager"}, {"id": "1096067", "name": "김재현", "branch": "이마트 E/T스타필드위례점", "permission": "manager"}, {"id": "1029014", "name": "신용문", "branch": "일렉트로마트 STF화서", "permission": "manager"}, {"id": "1089908", "name": "평태규", "branch": "일렉트로마트STF안성", "permission": "manager"}, {"id": "1049683", "name": "장봉규", "branch": "(신)이마트 E/T구성점", "permission": "manager"}, {"id": "1053006", "name": "김희성", "branch": "(신)이마트 E/T비산점", "permission": "manager"}, {"id": "1060086", "name": "김시배", "branch": "(신)이마트 E/T수원점", "permission": "manager"}, {"id": "1012679", "name": "신국현", "branch": "(신)이마트 E/T스타필드하남점", "permission": "manager"}, {"id": "1105810", "name": "임광수", "branch": "(신)이마트 E/T안산신길점", "permission": "manager"}, {"id": "1000534", "name": "이진희", "branch": "(신)이마트 E/T천안아산점", "permission": "manager"}, {"id": "1053837", "name": "최석원", "branch": "(신)이마트 가든5점", "permission": "manager"}, {"id": "1001787", "name": "서혜란", "branch": "(신)이마트 경기광주점", "permission": "manager"}, {"id": "1001142", "name": "정병희", "branch": "(신)이마트 경산점", "permission": "manager"}, {"id": "1000022", "name": "손태수", "branch": "(신)이마트 고잔점", "permission": "manager"}, {"id": "1000668", "name": "김도균", "branch": "(신)이마트 광교점", "permission": "manager"}, {"id": "1107294", "name": "김민재", "branch": "(신)이마트 구미점", "permission": "manager"}, {"id": "1056006", "name": "박대성", "branch": "(신)이마트 김천점", "permission": "manager"}, {"id": "2102390", "name": "이소미", "branch": "(신)이마트 동구미점", "permission": "manager"}, {"id": "1064781", "name": "이우용", "branch": "(신)이마트 동백점", "permission": "manager"}, {"id": "2001959", "name": "김기철", "branch": "(신)이마트 동탄점", "permission": "manager"}, {"id": "1086624", "name": "변재광", "branch": "(신)이마트 만촌점", "permission": "manager"}, {"id": "1000017", "name": "김미경", "branch": "(신)이마트 명일점", "permission": "manager"}, {"id": "1067476", "name": "옥정순", "branch": "(신)이마트 반야월점", "permission": "manager"}, {"id": "1055795", "name": "장희정", "branch": "(신)이마트 보라점", "permission": "manager"}, {"id": "1105454", "name": "이상준", "branch": "(신)이마트 분당점", "permission": "manager"}, {"id": "1069621", "name": "김규태", "branch": "(신)이마트 산본점", "permission": "manager"}, {"id": "1015214", "name": "한동훈", "branch": "(신)이마트 상주점", "permission": "manager"}, {"id": "1800744", "name": "마상찬", "branch": "(신)이마트 서산점", "permission": "manager"}, {"id": "1067571", "name": "김태옥", "branch": "(신)이마트 서수원점", "permission": "manager"}, {"id": "1064439", "name": "문소현", "branch": "(신)이마트 성남점", "permission": "manager"}, {"id": "1093250", "name": "배강원", "branch": "(신)이마트 성서점", "permission": "manager"}, {"id": "1096264", "name": "이정민", "branch": "(신)이마트 수원점", "permission": "manager"}, {"id": "1001492", "name": "장민우", "branch": "(신)이마트 수지점", "permission": "manager"}, {"id": "2002109", "name": "우영준", "branch": "(신)이마트 스타필드하남점", "permission": "manager"}, {"id": "1901291", "name": "설인수", "branch": "(신)이마트 아산점", "permission": "manager"}, {"id": "1089855", "name": "최장우", "branch": "(신)이마트 안성점", "permission": "manager"}, {"id": "1092392", "name": "최문경", "branch": "(신)이마트 양재점", "permission": "manager"}, {"id": "1011307", "name": "이재성", "branch": "(신)이마트 영천점", "permission": "manager"}, {"id": "1032264", "name": "고은재", "branch": "(신)이마트 오산점", "permission": "manager"}, {"id": "1097354", "name": "전현오", "branch": "(신)이마트 용인점", "permission": "manager"}, {"id": "1001124", "name": "이동우", "branch": "(신)이마트 월배점", "permission": "manager"}, {"id": "2303156", "name": "백상훈", "branch": "(신)이마트 이동점", "permission": "manager"}, {"id": "1000689", "name": "김선향", "branch": "(신)이마트 죽전점", "permission": "manager"}, {"id": "1027456", "name": "김영근", "branch": "(신)이마트 천안서북점", "permission": "manager"}, {"id": "1097066", "name": "최경영", "branch": "(신)이마트 천안점", "permission": "manager"}, {"id": "1103146", "name": "양미경", "branch": "(신)이마트 천안터미널점", "permission": "manager"}, {"id": "1000070", "name": "안준영", "branch": "(신)이마트 천호점", "permission": "manager"}, {"id": "1028313", "name": "김미영", "branch": "(신)이마트 청주점", "permission": "manager"}, {"id": "1014613", "name": "김동현", "branch": "(신)이마트 충주점", "permission": "manager"}, {"id": "1012629", "name": "이삼석", "branch": "(신)이마트 칠성점", "permission": "manager"}, {"id": "1800909", "name": "곽영옥", "branch": "(신)이마트 평촌점", "permission": "manager"}, {"id": "1051934", "name": "윤성희", "branch": "(신)이마트 평택점", "permission": "manager"}, {"id": "1901417", "name": "최영경", "branch": "(신)이마트 포항점", "permission": "manager"}, {"id": "1018375", "name": "강경동", "branch": "(신)이마트 하남점", "permission": "manager"}, {"id": "1000639", "name": "김현숙", "branch": "(신)이마트 화성봉담점", "permission": "manager"}, {"id": "1107423", "name": "오희순", "branch": "(신)이마트 흥덕점", "permission": "manager"}, {"id": "1000804", "name": "고영돈", "branch": "E/T동탄점", "permission": "manager"}, {"id": "1065271", "name": "이종헌", "branch": "E/T스타필드안성점", "permission": "manager"}, {"id": "1093106", "name": "김기은", "branch": "E/T화서점", "permission": "manager"}, {"id": "1901480", "name": "오수현", "branch": "이마트 E/T군포점", "permission": "manager"}, {"id": "1060056", "name": "김성민", "branch": "이마트 E/T스타필드위례점", "permission": "manager"}, {"id": "1800881", "name": "최수영", "branch": "일렉트로마트 STF화서", "permission": "manager"}, {"id": "1018189", "name": "이재왕", "branch": "(신)이마트 E/T구성점", "permission": "manager"}, {"id": "1001856", "name": "김용하", "branch": "(신)이마트 E/T구성점", "permission": "manager"}, {"id": "2202859", "name": "한상현", "branch": "(신)이마트 E/T비산점", "permission": "manager"}, {"id": "1100010", "name": "김정일", "branch": "(신)이마트 E/T비산점", "permission": "manager"}, {"id": "1000969", "name": "신수미", "branch": "(신)이마트 E/T비산점", "permission": "manager"}, {"id": "1090005", "name": "김현일", "branch": "(신)이마트 E/T수원점", "permission": "manager"}, {"id": "2102198", "name": "유용현", "branch": "(신)이마트 E/T수원점", "permission": "manager"}, {"id": "1108150", "name": "육지수", "branch": "(신)이마트 E/T스타필드하남점", "permission": "manager"}, {"id": "1072196", "name": "고경석", "branch": "(신)이마트 E/T스타필드하남점", "permission": "manager"}, {"id": "1000613", "name": "최영재", "branch": "(신)이마트 E/T안산신길점", "permission": "manager"}, {"id": "1032251", "name": "최선영", "branch": "(신)이마트 E/T안산신길점", "permission": "manager"}, {"id": "1097269", "name": "김미진", "branch": "(신)이마트 E/T천안아산점", "permission": "manager"}, {"id": "1800648", "name": "홍대기", "branch": "(신)이마트 E/T천안아산점", "permission": "manager"}, {"id": "1069717", "name": "전수환", "branch": "(신)이마트 E/T천안아산점", "permission": "manager"}, {"id": "1800607", "name": "전은정", "branch": "(신)이마트 가든5점", "permission": "manager"}, {"id": "1060066", "name": "신동열", "branch": "(신)이마트 경기광주점", "permission": "manager"}, {"id": "1013684", "name": "서옥진", "branch": "(신)이마트 경산점", "permission": "manager"}, {"id": "1071817", "name": "김은정", "branch": "(신)이마트 경산점", "permission": "manager"}, {"id": "2001760", "name": "송선민", "branch": "(신)이마트 고잔점", "permission": "manager"}, {"id": "1002125", "name": "김정희", "branch": "(신)이마트 고잔점", "permission": "manager"}, {"id": "1105365", "name": "오종숙", "branch": "(신)이마트 광교점", "permission": "manager"}, {"id": "1800879", "name": "장혁", "branch": "(신)이마트 광교점", "permission": "manager"}, {"id": "2403256", "name": "황재욱", "branch": "(신)이마트 구미점", "permission": "manager"}, {"id": "1092811", "name": "곽종성", "branch": "(신)이마트 구미점", "permission": "manager"}, {"id": "2303137", "name": "전경희", "branch": "(신)이마트 김천점", "permission": "manager"}, {"id": "1001496", "name": "김순영", "branch": "(신)이마트 동구미점", "permission": "manager"}, {"id": "1091028", "name": "이정종", "branch": "(신)이마트 동백점", "permission": "manager"}, {"id": "2002166", "name": "박재영", "branch": "(신)이마트 동탄점", "permission": "manager"}, {"id": "1055745", "name": "김혜숙", "branch": "(신)이마트 동탄점", "permission": "manager"}, {"id": "1800134", "name": "배동호", "branch": "(신)이마트 만촌점", "permission": "manager"}, {"id": "2102610", "name": "배진만", "branch": "(신)이마트 만촌점", "permission": "manager"}, {"id": "1043736", "name": "황영희", "branch": "(신)이마트 만촌점", "permission": "manager"}, {"id": "1800390", "name": "강봉성", "branch": "(신)이마트 반야월점", "permission": "manager"}, {"id": "1069872", "name": "이종한", "branch": "(신)이마트 반야월점", "permission": "manager"}, {"id": "1060467", "name": "김귀준", "branch": "(신)이마트 보령점", "permission": "manager"}, {"id": "1099426", "name": "송은주", "branch": "(신)이마트 분당점", "permission": "manager"}, {"id": "2403208", "name": "김효송", "branch": "(신)이마트 분당점", "permission": "manager"}, {"id": "1000700", "name": "이민봉", "branch": "(신)이마트 산본점", "permission": "manager"}, {"id": "1032575", "name": "이규성", "branch": "(신)이마트 산본점", "permission": "manager"}, {"id": "1035418", "name": "박원규", "branch": "(신)이마트 상주점", "permission": "manager"}, {"id": "1075431", "name": "김승우", "branch": "(신)이마트 서수원점", "permission": "manager"}, {"id": "2403205", "name": "조건영", "branch": "(신)이마트 서수원점", "permission": "manager"}, {"id": "1106412", "name": "이성준", "branch": "(신)이마트 성남점", "permission": "manager"}, {"id": "1070180", "name": "최심숙", "branch": "(신)이마트 성서점", "permission": "manager"}, {"id": "1901212", "name": "신해경", "branch": "(신)이마트 성서점", "permission": "manager"}, {"id": "1063035", "name": "조성근", "branch": "(신)이마트 수원점", "permission": "manager"}, {"id": "1058674", "name": "김지은", "branch": "(신)이마트 수원점", "permission": "manager"}, {"id": "2403198", "name": "신동진", "branch": "(신)이마트 수지점", "permission": "manager"}, {"id": "1901529", "name": "유기민", "branch": "(신)이마트 수지점", "permission": "manager"}, {"id": "1015577", "name": "임효근", "branch": "(신)이마트 스타필드하남점", "permission": "manager"}, {"id": "1019380", "name": "김재희", "branch": "(신)이마트 스타필드하남점", "permission": "manager"}, {"id": "2403270", "name": "손일석", "branch": "(신)이마트 아산점", "permission": "manager"}, {"id": "1901351", "name": "김수미", "branch": "(신)이마트 안성점", "permission": "manager"}, {"id": "1071926", "name": "채승현", "branch": "(신)이마트 양재점", "permission": "manager"}, {"id": "2202793", "name": "이석배", "branch": "(신)이마트 영천점", "permission": "manager"}, {"id": "2001892", "name": "윤민운", "branch": "(신)이마트 오산점", "permission": "manager"}, {"id": "1000621", "name": "홍은미", "branch": "(신)이마트 용인점", "permission": "manager"}, {"id": "2202860", "name": "이은진", "branch": "(신)이마트 월배점", "permission": "manager"}, {"id": "1053649", "name": "송한진", "branch": "(신)이마트 월배점", "permission": "manager"}, {"id": "1102742", "name": "공복순", "branch": "(신)이마트 이동점", "permission": "manager"}, {"id": "1071213", "name": "김선희", "branch": "(신)이마트 이동점", "permission": "manager"}, {"id": "1091812", "name": "이호철", "branch": "(신)이마트 죽전점", "permission": "manager"}, {"id": "1068428", "name": "이병곤", "branch": "(신)이마트 죽전점", "permission": "manager"}, {"id": "1098832", "name": "주성환", "branch": "(신)이마트 죽전점", "permission": "manager"}, {"id": "1050504", "name": "김은희", "branch": "(신)이마트 천안서북점", "permission": "manager"}, {"id": "2202937", "name": "조정현", "branch": "(신)이마트 천안서북점", "permission": "manager"}, {"id": "2202790", "name": "이태헌", "branch": "(신)이마트 천안점", "permission": "manager"}, {"id": "1800117", "name": "박종헌", "branch": "(신)이마트 천안점", "permission": "manager"}, {"id": "1031009", "name": "이나겸", "branch": "(신)이마트 천안점", "permission": "manager"}, {"id": "1106689", "name": "최태순", "branch": "(신)이마트 천호점", "permission": "manager"}, {"id": "1901405", "name": "권오선", "branch": "(신)이마트 청주점", "permission": "manager"}, {"id": "2102557", "name": "백경환", "branch": "(신)이마트 충주점", "permission": "manager"}, {"id": "1032231", "name": "임병숙", "branch": "(신)이마트 칠성점", "permission": "manager"}, {"id": "1002525", "name": "최영숙", "branch": "(신)이마트 칠성점", "permission": "manager"}, {"id": "2303080", "name": "전우민", "branch": "(신)이마트 평촌점", "permission": "manager"}, {"id": "2202933", "name": "이원구", "branch": "(신)이마트 평택점", "permission": "manager"}, {"id": "1097823", "name": "남준현", "branch": "(신)이마트 평택점", "permission": "manager"}, {"id": "1901600", "name": "김수민", "branch": "(신)이마트 포항점", "permission": "manager"}, {"id": "2102340", "name": "백두현", "branch": "(신)이마트 포항점", "permission": "manager"}, {"id": "2102563", "name": "이호경", "branch": "(신)이마트 하남점", "permission": "manager"}, {"id": "1072277", "name": "김영서", "branch": "(신)이마트 화성봉담점", "permission": "manager"}, {"id": "1030861", "name": "육근배", "branch": "(신)이마트 흥덕점", "permission": "manager"}, {"id": "1800883", "name": "이영민", "branch": "E/T동탄점", "permission": "manager"}, {"id": "1800014", "name": "유성범", "branch": "E/T스타필드안성점", "permission": "manager"}, {"id": "1063155", "name": "김영훈", "branch": "E/T스타필드안성점", "permission": "manager"}, {"id": "2403209", "name": "서성원", "branch": "E/T화서점", "permission": "manager"}, {"id": "1107242", "name": "박경희", "branch": "이마트 E/T군포점", "permission": "manager"}, {"id": "2303019", "name": "김진우", "branch": "이마트 E/T군포점", "permission": "manager"}, {"id": "2403201", "name": "변창식", "branch": "이마트 E/T스타필드위례점", "permission": "manager"}, {"id": "1097927", "name": "임채용", "branch": "이마트 E/T스타필드위례점", "permission": "manager"}, {"id": "1046983", "name": "심재용", "branch": "일렉트로마트 STF화서", "permission": "manager"}, {"id": "1901186", "name": "김효종", "branch": "일렉트로마트 STF화서", "permission": "manager"}, {"id": "2503323", "name": "강신덕", "branch": "일렉트로마트STF안성", "permission": "manager"}, {"id": "1059959", "name": "조현", "branch": "일렉트로마트STF안성", "permission": "manager"}, {"id": "2303023", "name": "이준이", "branch": "신 홈플러스 천안점", "permission": "manager"}, {"id": "1089779", "name": "이승철", "branch": "(신)홈플러스 평택안중점", "permission": "manager"}, {"id": "1031277", "name": "이수석", "branch": "신 홈플러스 강동점", "permission": "manager"}, {"id": "1069907", "name": "이승만", "branch": "신 홈플러스 경기하남점", "permission": "manager"}, {"id": "1001620", "name": "김민경", "branch": "신 홈플러스 경산점", "permission": "manager"}, {"id": "1000994", "name": "이창희", "branch": "신 홈플러스 대구수성점", "permission": "manager"}, {"id": "1060245", "name": "손영민", "branch": "신 홈플러스 동청주점", "permission": "manager"}, {"id": "1000620", "name": "하현주", "branch": "신 홈플러스 분당오리점", "permission": "manager"}, {"id": "1032176", "name": "허화식", "branch": "신 홈플러스 상인점", "permission": "manager"}, {"id": "1900928", "name": "정동희", "branch": "신 홈플러스 서수원점", "permission": "manager"}, {"id": "1067376", "name": "김현진", "branch": "신 홈플러스 서울남현점", "permission": "manager"}, {"id": "1044567", "name": "김덕룡", "branch": "신 홈플러스 송탄점", "permission": "manager"}, {"id": "1019278", "name": "이선화", "branch": "신 홈플러스 안동점", "permission": "manager"}, {"id": "1052889", "name": "여상득", "branch": "신 홈플러스 영주점", "permission": "manager"}, {"id": "1028319", "name": "임동찬", "branch": "신 홈플러스 오산점", "permission": "manager"}, {"id": "1000168", "name": "허미향", "branch": "신 홈플러스 오창점", "permission": "manager"}, {"id": "1106615", "name": "유명진", "branch": "신 홈플러스 평촌점", "permission": "manager"}, {"id": "1088976", "name": "최득근", "branch": "신 홈플러스 화성향남점", "permission": "manager"}, {"id": "1072523", "name": "곽지훈", "branch": "(신)홈플러스 평택안중점", "permission": "manager"}, {"id": "1029811", "name": "이정우", "branch": "신 홈플러스 강동점", "permission": "manager"}, {"id": "1104204", "name": "박신욱", "branch": "신 홈플러스 경산점", "permission": "manager"}, {"id": "1001420", "name": "이경향", "branch": "신 홈플러스 논산점", "permission": "manager"}, {"id": "1027399", "name": "황운용", "branch": "신 홈플러스 대구수성점", "permission": "manager"}, {"id": "1000154", "name": "오정숙", "branch": "신 홈플러스 동청주점", "permission": "manager"}, {"id": "1060185", "name": "김동환", "branch": "신 홈플러스 문경점", "permission": "manager"}, {"id": "1800717", "name": "이경주", "branch": "신 홈플러스 보령점", "permission": "manager"}, {"id": "1044070", "name": "김은아", "branch": "신 홈플러스 상인점", "permission": "manager"}, {"id": "2303005", "name": "김형준", "branch": "신 홈플러스 안동점", "permission": "manager"}, {"id": "1800775", "name": "김주현", "branch": "신 홈플러스 영주점", "permission": "manager"}, {"id": "1800037", "name": "김선영", "branch": "신 홈플러스 오창점", "permission": "manager"}, {"id": "1100226", "name": "정무정", "branch": "신 홈플러스 잠실점", "permission": "manager"}, {"id": "1800562", "name": "임영선", "branch": "신 홈플러스 죽도점", "permission": "manager"}, {"id": "2102247", "name": "김동화", "branch": "신 홈플러스 천안점", "permission": "manager"}, {"id": "2102505", "name": "오준석", "branch": "신 홈플러스 청주성안점", "permission": "manager"}, {"id": "1104896", "name": "천영지", "branch": "신 홈플러스 포항점", "permission": "manager"}, {"id": "1032620", "name": "윤기세", "branch": "신 홈플러스 화성향남점", "permission": "manager"}, {"id": "2503364", "name": "박대훈", "branch": "(신)이마트 칠성점", "permission": "manager"}, {"id": "2503302", "name": "이종호", "branch": "(신)이마트 천안터미널점", "permission": "manager"}];
@@ -649,7 +777,11 @@
                 alert('지점 데이터가 없습니다.');
                 return;
             }
+
+            // 탭 메뉴 표시
+            document.getElementById('dashboardTabs').style.display = 'flex';
             
+            // 실적 대시보드 렌더링
             renderAIFeedback(branchData);
             renderEvaluation(branchData);  // ✅ 추가!
             renderGroupRankings(branchData);  // ✅ 추가!
@@ -657,7 +789,11 @@
             renderCompetition(branchData);
             renderMB(branchData);
             renderSubscription(branchData);
+            
+            // 수당 대시보드 렌더링
+            renderAllowanceDashboard(branchData);
         }
+
                 function renderEvaluation(data) {
             // evaluation 객체가 없으면 빈 카드 표시
             if (!data.evaluation) {
@@ -1024,6 +1160,172 @@
             document.getElementById('subscriptionCard').innerHTML = html;
         }
         
+        // ========================================
+        // 탭 전환 함수
+        // ========================================
+        function switchTab(tabName) {
+        // 탭 버튼 활성화 상태 변경
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+    
+        // 탭 콘텐츠 표시/숨김
+        if (tabName === 'performance') {
+            document.getElementById('performanceTab').style.display = 'block';
+            document.getElementById('allowanceTab').style.display = 'none';
+        } else if (tabName === 'allowance') {
+            document.getElementById('performanceTab').style.display = 'none';
+            document.getElementById('allowanceTab').style.display = 'block';
+        
+            // 수당 대시보드 렌더링 (처음 열 때만)
+            if (!document.getElementById('allowanceTab').hasAttribute('data-rendered')) {
+                renderAllowanceDashboard();
+                document.getElementById('allowanceTab').setAttribute('data-rendered', 'true');
+        }
+    }
+}
+
+        // ========================================
+        // 수당 대시보드 렌더링 함수
+        // ========================================
+        function renderAllowanceDashboard() {
+            const branchData = ALL_BRANCHES_DATA.find(b => b.name === currentBranch);
+            if (!branchData) return;
+    
+            const lumpsum = branchData['일시불수당'] || {};
+            const subscription = branchData['구독수당'] || {};
+            const gradeList = branchData['컨테스트Grade'] || [];
+            const focusList = branchData['컨테스트집중제품'] || [];
+    
+            let html = '';
+    
+            // 1. 수당 요약 카드
+            const lumpsumTotal = Object.values(lumpsum).reduce((sum, val) => {
+                return sum + (typeof val === 'number' ? val : 0);
+            }, 0);
+    
+            const subscriptionTotal = Object.values(subscription).reduce((sum, val) => {
+                return sum + (typeof val === 'number' ? val : 0);
+            }, 0);
+    
+            const gradeTotal = gradeList.reduce((sum, manager) => {
+                return sum + (manager['Grade수당'] || 0) + (manager['Grade판매수당'] || 0);
+            }, 0);
+    
+            const focusTotal = focusList.reduce((sum, manager) => {
+                return sum + (manager['집중제품수당'] || 0);
+            }, 0);
+    
+            html += '<div class="card">';
+            html += '<div class="card-title"><span class="badge badge-primary">💰 수당 요약</span></div>';
+            html += '<div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-top: 20px;">';
+    
+            // 5개 요약 카드
+            html += '<div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); padding: 20px; border-radius: 12px;">';
+            html += '<div style="font-size: 12px; color: #1565c0; margin-bottom: 8px;">일시불 수당</div>';
+            html += '<div style="font-size: 24px; font-weight: 700; color: #0d47a1;">' + lumpsumTotal.toLocaleString() + '원</div>';
+            html += '</div>';
+    
+            html += '<div style="background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); padding: 20px; border-radius: 12px;">';
+            html += '<div style="font-size: 12px; color: #2e7d32; margin-bottom: 8px;">구독 수당</div>';
+            html += '<div style="font-size: 24px; font-weight: 700; color: #1b5e20;">' + subscriptionTotal.toLocaleString() + '원</div>';
+            html += '</div>';
+    
+            html += '<div style="background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); padding: 20px; border-radius: 12px;">';
+            html += '<div style="font-size: 12px; color: #e65100; margin-bottom: 8px;">Grade 컨테스트</div>';
+            html += '<div style="font-size: 24px; font-weight: 700; color: #bf360c;">' + gradeTotal.toLocaleString() + '원</div>';
+            html += '</div>';
+    
+            html += '<div style="background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%); padding: 20px; border-radius: 12px;">';
+            html += '<div style="font-size: 12px; color: #c2185b; margin-bottom: 8px;">집중제품</div>';
+            html += '<div style="font-size: 24px; font-weight: 700; color: #880e4f;">' + focusTotal.toLocaleString() + '원</div>';
+            html += '</div>';
+    
+            const grandTotal = lumpsumTotal + subscriptionTotal + gradeTotal + focusTotal;
+            html += '<div style="background: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%); padding: 20px; border-radius: 12px; border: 2px solid rgba(94,53,177,0.3);">';
+            html += '<div style="font-size: 12px; color: #5e35b1; margin-bottom: 8px;">전체 합계</div>';
+            html += '<div style="font-size: 24px; font-weight: 700; color: #4527a0;">' + grandTotal.toLocaleString() + '원</div>';
+            html += '</div>';
+    
+            html += '</div></div>';
+    
+            // 2. 일시불 수당 상세 테이블
+            html += '<div class="card">';
+            html += '<div class="card-title"><span class="badge badge-primary">일시불 수당 상세</span></div>';
+            html += '<div class="table-container"><table class="eval-table">';
+            html += '<thead><tr><th>항목</th><th>수량</th><th>수당</th></tr></thead><tbody>';
+    
+            const lumpsumItems = [
+                ['트롬건조기', '트롬건조기_수량', '트롬건조기_수당'],
+                ['통돌이', '통돌이_수량', '통돌이_수당'],
+                // ... 나머지 항목들 추가
+            ];
+    
+            lumpsumItems.forEach(([label, qtyKey, amountKey]) => {
+                const qty = lumpsum[qtyKey] || 0;
+                const amount = lumpsum[amountKey] || 0;
+                html += '<tr>';
+                html += '<td class="gubun-col">' + label + '</td>';
+                html += '<td>' + qty.toLocaleString() + '</td>';
+                html += '<td class="value-highlight">' + amount.toLocaleString() + '원</td>';
+                html += '</tr>';
+            });
+    
+            html += '</tbody></table></div></div>';
+    
+            // 3. 구독 수당 상세 (일시불과 동일 구조)
+            // ... (생략, 일시불과 같은 방식)
+    
+            // 4. 컨테스트 Grade
+            if (gradeList.length > 0) {
+                html += '<div class="card">';
+                html += '<div class="card-title"><span class="badge badge-primary">컨테스트 Grade (매니저별)</span></div>';
+                html += '<div class="table-container"><table class="ranking-table">';
+                html += '<thead><tr><th>매니저명</th><th>직책</th><th>사번</th><th>Grade총판</th><th>등급</th><th>수당</th><th>실판</th><th>판매수당</th></tr></thead><tbody>';
+        
+                gradeList.forEach(manager => {
+                    html += '<tr>';
+                    html += '<td class="branch-name">' + manager['매니저명'] + '</td>';
+                    html += '<td>' + manager['직책'] + '</td>';
+                    html += '<td>' + manager['사번'] + '</td>';
+                    html += '<td>' + manager['Grade총판'].toLocaleString() + '</td>';
+                    html += '<td>' + manager['Grade등급'].toLocaleString() + '</td>';
+                    html += '<td class="value-highlight">' + manager['Grade수당'].toLocaleString() + '원</td>';
+                    html += '<td>' + manager['Grade실판'].toLocaleString() + '</td>';
+                    html += '<td class="value-highlight">' + manager['Grade판매수당'].toLocaleString() + '원</td>';
+                    html += '</tr>';
+                });
+        
+             html += '</tbody></table></div></div>';
+        }
+    
+            // 5. 컨테스트 집중제품
+            if (focusList.length > 0) {
+                html += '<div class="card">';
+                html += '<div class="card-title"><span class="badge badge-primary">컨테스트 집중제품 (매니저별)</span></div>';
+                html += '<div class="table-container"><table class="ranking-table">';
+                html += '<thead><tr><th>매니저명</th><th>직책</th><th>사번</th><th>집중제품수당</th><th>통돌이</th><th>스탠바이미</th><th>김치냉장고</th><th>가습기</th><th>대상모델총판</th></tr></thead><tbody>';
+        
+                focusList.forEach(manager => {
+                    html += '<tr>';
+                    html += '<td class="branch-name">' + manager['매니저명'] + '</td>';
+                    html += '<td>' + manager['직책'] + '</td>';
+                    html += '<td>' + manager['사번'] + '</td>';
+                    html += '<td class="value-highlight">' + manager['집중제품수당'].toLocaleString() + '원</td>';
+                    html += '<td>' + manager['통돌이'].toLocaleString() + '</td>';
+                    html += '<td>' + manager['스탠바이미'].toLocaleString() + '</td>';
+                    html += '<td>' + manager['김치냉장고'].toLocaleString() + '</td>';
+                    html += '<td>' + manager['가습기'].toLocaleString() + '</td>';
+                    html += '<td>' + manager['대상모델총판'].toLocaleString() + '</td>';
+                    html += '</tr>';
+                });
+        
+                html += '</tbody></table></div></div>';
+            }
+    
+            document.getElementById('allowanceTab').innerHTML = html;
+    }
+
       function getRatingBadge(rating, maxScore, minScore) {
     // 기본값 설정 (하위 호환성)
     if (typeof maxScore === 'undefined' || maxScore === null || maxScore === 0) {
