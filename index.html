@@ -374,6 +374,21 @@
             color: #1a2332;
         }
         
+/* ========================================
+   반응형 그리드 시스템
+   ======================================== */
+.allowance-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.evaluation-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+}
+
         @media (max-width: 768px) {
             .container { padding: 20px 10px; }
             .main-header { padding: 15px 20px; }
@@ -385,24 +400,40 @@
             .eval-table.mb-table th, .eval-table.mb-table td { padding: 8px 4px; }
   
             /* ✨ 아래 코드 추가 ✨ */
-            .table-container {
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch; /* 부드러운 스크롤 */
+            .allowance-grid {
+                grid-template-columns: 1fr !important;
+                gap: 12px !important;
+            }
+    
+            .evaluation-grid {
+                grid-template-columns: 1fr !important;
+                gap: 12px !important;
+            }
+    
+            div[style*="font-size: 24px"] {
+                font-size: 20px !important;
+            }
+    
+            div[style*="font-size: 32px"] {
+                font-size: 26px !important;
             }
     
             .header-right {
-                flex-direction: column; /* 헤더 세로 배치 */
-                gap: 10px;
+                flex-direction: column;
+                gap: 8px;
+                width: 100%;
             }
     
-            .branch-selector, .logout-btn {
-                width: 100%; /* 버튼 전체 너비 */
+            .branch-selector,
+            .logout-btn {
+                width: 100%;
             }
     
             .suggestions-grid {
-                grid-template-columns: 1fr; /* 카드 1열 배치 */
+                grid-template-columns: 1fr !important;
             }
-                }
+    
+        }
 
 
 /* AI 섹션 개선 */
@@ -611,6 +642,15 @@
     border-collapse: collapse;
     font-size: 14px;
     background: white;
+}
+
+/* ========================================
+   수당 카드 반응형 그리드
+   ======================================== */
+.allowance-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* PC: 3열 */
+    gap: 20px;
 }
 
 .allowance-table thead {
@@ -1109,7 +1149,7 @@
             html += '</div>';
             
             // 상단: 5개 평가 카드 (균등 배치)
-            html += '<div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-top: 20px;">';
+            html += '<div class="evaluation-grid" style="display: grid; gap: 16px; margin-top: 20px;">';
             
             // 1. 평가그룹 & 순위 카드 (개선된 색상)
             html += '<div style="background: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%); padding: 20px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.06); box-shadow: 0 2px 8px rgba(0,0,0,0.04);">';
@@ -1785,7 +1825,7 @@
     html += '<div style="font-size: 36px; font-weight: 800; color: #fff;">' + grandTotal.toLocaleString() + '<span style="font-size: 24px; margin-left: 5px;">원</span></div>';
     html += '</div></div>';
     
-    html += '<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 32px;">';
+    html += '<div class="allowance-grid" style="display: grid; gap: 20px; margin-bottom: 32px;">';
 
     html += '<div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); padding: 20px; border-radius: 12px;">';
     html += '<div style="font-size: 12px; color: #1565c0; margin-bottom: 8px;">일시불+구독비중</div>';
