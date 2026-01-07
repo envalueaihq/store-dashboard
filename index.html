@@ -482,48 +482,190 @@
          display: none !important;
      }
  
-     .mobile-card {
-         background: #ffffff;
-         border: 1px solid #e0e0e0;
-         border-radius: 12px;
-         padding: 16px;
-         margin-bottom: 12px;
-         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-     }
- 
-     .mobile-card-header {
-         font-size: 15px;
-         font-weight: 600;
-         color: #1d1d1f;
-         margin-bottom: 12px;
-         padding-bottom: 8px;
-         border-bottom: 1px solid #f0f0f0;
-     }
- 
-     .mobile-card-body {
-         display: flex;
-         flex-direction: column;
-         gap: 8px;
-     }
- 
-     .mobile-card-row {
-         display: flex;
-         justify-content: space-between;
-         align-items: center;
-         padding: 6px 0;
-     }
- 
-     .mobile-card-label {
-         font-size: 13px;
-         color: #666;
-         font-weight: 500;
-    }
- 
-     .mobile-card-value {
-         font-size: 14px;
-         font-weight: 600;
-         color: #1d1d1f;
-     }
+            /* ========================================
+               모바일 카드 UI - 프리미엄 디자인
+               ======================================== */
+            .mobile-card {
+                background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+                border: 1px solid rgba(0, 0, 0, 0.08);
+                border-radius: 16px;
+                padding: 20px;
+                margin-bottom: 16px;
+                box-shadow: 
+                    0 4px 12px rgba(0, 0, 0, 0.06),
+                    0 1px 3px rgba(0, 0, 0, 0.04);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .mobile-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 4px;
+                height: 100%;
+                background: linear-gradient(180deg, #0071e3 0%, #0077ed 100%);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .mobile-card:active {
+                transform: scale(0.98);
+                box-shadow: 
+                    0 2px 8px rgba(0, 0, 0, 0.08),
+                    0 1px 2px rgba(0, 0, 0, 0.06);
+            }
+
+            .mobile-card:active::before {
+                opacity: 1;
+            }
+    
+            .mobile-card-header {
+                font-size: 16px;
+                font-weight: 700;
+                color: #1d1d1f;
+                margin-bottom: 16px;
+                padding-bottom: 12px;
+                border-bottom: 2px solid #f0f0f0;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                letter-spacing: -0.02em;
+            }
+
+            .mobile-card-header::before {
+                content: '📊';
+                font-size: 20px;
+            }
+    
+            .mobile-card-body {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+    
+            .mobile-card-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 12px;
+                background: rgba(255, 255, 255, 0.5);
+                border-radius: 10px;
+                transition: all 0.2s ease;
+            }
+
+            .mobile-card-row:active {
+                background: rgba(0, 113, 227, 0.05);
+                transform: translateX(4px);
+            }
+    
+            .mobile-card-label {
+                font-size: 13px;
+                color: #666;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .mobile-card-label::before {
+                content: '•';
+                color: #0071e3;
+                font-size: 16px;
+                font-weight: bold;
+            }
+    
+            .mobile-card-value {
+                font-size: 15px;
+                font-weight: 700;
+                color: #1d1d1f;
+                letter-spacing: -0.01em;
+            }
+
+            /* 금액 컬러 시스템 */
+            .mobile-card-value.amount-positive {
+                color: #34c759;
+                text-shadow: 0 1px 2px rgba(52, 199, 89, 0.2);
+            }
+
+            .mobile-card-value.amount-negative {
+                color: #ff3b30;
+                text-shadow: 0 1px 2px rgba(255, 59, 48, 0.2);
+            }
+
+            .mobile-card-value.amount-zero {
+                color: #8e8e93;
+            }
+
+            /* 특별 강조 카드 (합계/총계) */
+            .mobile-card.total-card {
+                background: linear-gradient(145deg, #fff9e6 0%, #fff3cc 100%);
+                border: 2px solid #ffd60a;
+                box-shadow: 
+                    0 6px 16px rgba(255, 214, 10, 0.15),
+                    0 2px 4px rgba(0, 0, 0, 0.06);
+            }
+
+            .mobile-card.total-card::before {
+                background: linear-gradient(180deg, #ffd60a 0%, #ffb700 100%);
+                opacity: 1;
+                width: 5px;
+            }
+
+            .mobile-card.total-card .mobile-card-header {
+                color: #c17900;
+                border-bottom-color: #ffe066;
+            }
+
+            .mobile-card.total-card .mobile-card-header::before {
+                content: '💰';
+            }
+
+            .mobile-card.total-card .mobile-card-value {
+                color: #c17900;
+                font-size: 18px;
+                font-weight: 800;
+            }
+
+            /* 긴급/주의 카드 */
+            .mobile-card.alert-card {
+                background: linear-gradient(145deg, #fff5f5 0%, #ffe5e5 100%);
+                border: 2px solid #ff3b30;
+            }
+
+            .mobile-card.alert-card::before {
+                background: linear-gradient(180deg, #ff3b30 0%, #ff453a 100%);
+                opacity: 1;
+            }
+
+            .mobile-card.alert-card .mobile-card-header {
+                color: #d70015;
+            }
+
+            .mobile-card.alert-card .mobile-card-header::before {
+                content: '⚠️';
+            }
+
+            /* 성공 카드 */
+            .mobile-card.success-card {
+                background: linear-gradient(145deg, #f0fff4 0%, #dcffe4 100%);
+                border: 2px solid #34c759;
+            }
+
+            .mobile-card.success-card::before {
+                background: linear-gradient(180deg, #34c759 0%, #30d158 100%);
+                opacity: 1;
+            }
+
+            .mobile-card.success-card .mobile-card-header {
+                color: #248a3d;
+            }
+
+            .mobile-card.success-card .mobile-card-header::before {
+                content: '✅';
+            }
  }
 
 /* AI 섹션 개선 */
