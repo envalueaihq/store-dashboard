@@ -489,14 +489,15 @@
                 background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
                 border: 1px solid rgba(0, 0, 0, 0.08);
                 border-radius: 16px;
-                padding: 20px;
+                padding: 16px;  /* ✅ 변경: 20px → 16px */
                 margin-bottom: 16px;
+                max-width: 100%;  /* ✅ 추가: 화면 너비 초과 방지 */
                 box-shadow: 
                     0 4px 12px rgba(0, 0, 0, 0.06),
                     0 1px 3px rgba(0, 0, 0, 0.04);
                 transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 position: relative;
-                overflow: hidden;
+                overflow-x: auto;  /* ✅ 변경: overflow: hidden → overflow-x: auto */
             }
 
             .mobile-card::before {
@@ -523,16 +524,18 @@
             }
     
             .mobile-card-header {
-                font-size: 16px;
+                font-size: 14px;  /* ✅ 16px → 14px */
                 font-weight: 700;
                 color: #1d1d1f;
-                margin-bottom: 16px;
-                padding-bottom: 12px;
+                margin-bottom: 14px;  /* ✅ 16px → 14px */
+                padding-bottom: 10px;  /* ✅ 12px → 10px */
                 border-bottom: 2px solid #f0f0f0;
                 display: flex;
                 align-items: center;
-                gap: 8px;
+                gap: 6px;  /* ✅ 8px → 6px */
                 letter-spacing: -0.02em;
+                word-break: keep-all;  /* ✅ 추가: 한글 줄바꿈 최적화 */
+                line-height: 1.4;  /* ✅ 추가 */
             }
 
             .mobile-card-header::before {
@@ -550,10 +553,12 @@
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                padding: 10px 12px;
+                padding: 8px 10px;  /* ✅ 10px 12px → 8px 10px */
                 background: rgba(255, 255, 255, 0.5);
-                border-radius: 10px;
+                border-radius: 8px;  /* ✅ 10px → 8px */
                 transition: all 0.2s ease;
+                min-width: 0;  /* ✅ 추가: flex 자식 축소 허용 */
+                gap: 8px;  /* ✅ 추가: 레이블-값 간격 */
             }
 
             .mobile-card-row:active {
@@ -562,12 +567,15 @@
             }
     
             .mobile-card-label {
-                font-size: 13px;
+                font-size: 12px;  /* ✅ 13px → 12px */
                 color: #666;
                 font-weight: 600;
                 display: flex;
                 align-items: center;
-                gap: 6px;
+                gap: 4px;  /* ✅ 6px → 4px */
+                word-break: keep-all;  /* ✅ 추가 */
+                flex-shrink: 0;  /* ✅ 추가: 레이블은 축소 안 됨 */
+                max-width: 45%;  /* ✅ 추가: 레이블 최대 너비 제한 */
             }
 
             .mobile-card-label::before {
@@ -578,10 +586,13 @@
             }
     
             .mobile-card-value {
-                font-size: 15px;
+                font-size: 14px;  /* ✅ 15px → 14px */
                 font-weight: 700;
                 color: #1d1d1f;
                 letter-spacing: -0.01em;
+                text-align: right;  /* ✅ 추가 */
+                word-break: break-all;  /* ✅ 추가: 긴 숫자 줄바꿈 */
+                min-width: 0;  /* ✅ 추가 */
             }
 
             /* 금액 컬러 시스템 */
@@ -1061,9 +1072,11 @@
         }
 
         .policy-table {
-            max-width: 600px;
+            max-width: 100%;  /* 모바일 대응 */
+            width: 100%;
             margin: 15px auto;
             background: white;
+            overflow-x: auto;
         }
 
         .policy-note {
@@ -1145,7 +1158,26 @@
             .policy-section {
                 padding: 15px;
             }
-        }
+
+            /* ✅ 운영안 테이블 모바일 최적화 */
+            .policy-table {
+                font-size: 12px;  /* 폰트 크기 축소 */
+            }
+            
+            .policy-table th,
+            .policy-table td {
+                padding: 8px 4px;  /* 패딩 축소 */
+                font-size: 12px;
+            }
+            
+            .policy-section h3 {
+                font-size: 16px;  /* 제목 축소 */
+            }
+            
+            .policy-note {
+                font-size: 11px;  /* 노트 축소 */
+            }        
+    }
 
     </style>
 </head>
@@ -2145,7 +2177,7 @@
         html += '<div class="mobile-card-body">';
         html += '<div class="mobile-card-row">';
         html += '<span class="mobile-card-label">수량</span>';
-        html += '<span class="mobile-card-value">' + qty.toLocaleString() + '</span>';
+        html += '<span class="mobile-card-value">' + qty.toLocaleString() + '개</span>';
         html += '</div>';
         html += '<div class="mobile-card-row">';
         html += '<span class="mobile-card-label">수당</span>';
@@ -2209,50 +2241,46 @@
             html += '<div class="mobile-card">';
             html += '<div class="mobile-card-header">' + label + '</div>';
             html += '<div class="mobile-card-body">';
-            html += '<div class="mobile-card-row">';
-            html += '<span class="mobile-card-label">값</span>';
         
-            // 값 표시 로직
-            let displayValue = '';
-            if (typeof value === 'string') {
-                if (value === '최대구간') {
-                    displayValue = '<span style="color: #2e7d32; font-weight: 600;">최대구간</span>';
-                } else if (value === '-') {
-                    displayValue = '<span style="color: #666;">-</span>';
-                } else {
-                    displayValue = value;
-                }
-            } else if (label.includes('비중') || label.includes('율')) {
-                displayValue = (value * 100).toFixed(1) + '%';
-            } else {
-                displayValue = value.toLocaleString();
-            }
-        
-            html += '<span class="mobile-card-value">' + displayValue + '</span>';
-            html += '</div>';
-        
-            // 금액 표시 (해당하는 경우만)
             if (amountKey !== '-') {
-                html += '<div class="mobile-card-row">';
-                html += '<span class="mobile-card-label">금액</span>';
-            
                 let displayAmount = '';
+                
                 if (typeof amount === 'string') {
                     if (amount === '최대구간') {
-                        displayAmount = '<span style="color: #2e7d32; font-weight: 600;">최대구간</span>';
+                        displayAmount = '<span style="color: #2e7d32; font-size: 28px; font-weight: 800;">최대구간</span>';
                     } else if (amount === '-') {
-                        displayAmount = '<span style="color: #666;">-</span>';
+                        displayAmount = '<span style="color: #666; font-size: 28px; font-weight: 800;">-</span>';
                     } else {
-                        displayAmount = amount;
+                        displayAmount = '<span style="font-size: 28px; font-weight: 800;">' + amount + '</span>';
                     }
                 } else if (amount === 0) {
-                    displayAmount = '<span class="reference-text">-</span>';
+                    displayAmount = '<span style="color: #999; font-size: 28px; font-weight: 800;">-</span>';
                 } else {
                     const amountClass = amount < 0 ? 'amount-negative' : (amount > 0 ? 'amount-positive' : 'amount-zero');
-                    displayAmount = '<span class="' + amountClass + '">' + amount.toLocaleString() + '원</span>';
+                    displayAmount = '<span class="mobile-card-value ' + amountClass + '" style="font-size: 28px; font-weight: 800;">' + amount.toLocaleString() + '원</span>';
                 }
                 
-                html += '<span class="mobile-card-value">' + displayAmount + '</span>';
+                html += '<div style="text-align: center; padding: 20px 0;">';
+                html += displayAmount;
+                html += '</div>';
+            } else {
+                let displayValue = '';
+                if (typeof value === 'string') {
+                    if (value === '최대구간') {
+                        displayValue = '<span style="color: #2e7d32; font-size: 28px; font-weight: 800;">최대구간</span>';
+                    } else if (value === '-') {
+                        displayValue = '<span style="color: #666; font-size: 28px; font-weight: 800;">-</span>';
+                    } else {
+                        displayValue = '<span style="font-size: 28px; font-weight: 800;">' + value + '</span>';
+                    }
+                } else if (label.includes('비중') || label.includes('율')) {
+                    displayValue = '<span style="font-size: 28px; font-weight: 800;">' + (value * 100).toFixed(1) + '%</span>';
+                } else {
+                    displayValue = '<span style="font-size: 28px; font-weight: 800;">' + value.toLocaleString() + '</span>';
+                }
+                
+                html += '<div style="text-align: center; padding: 20px 0;">';
+                html += displayValue;
                 html += '</div>';
             }
         
@@ -2358,38 +2386,42 @@
         html += '<div class="mobile-card-header">' + label + '</div>';
         html += '<div class="mobile-card-body">';
         
-        // 값 표시
-        html += '<div class="mobile-card-row">';
-        html += '<span class="mobile-card-label">값</span>';
-        let displayValue = '';
-        if (label.includes('실판') || label.includes('구간')) {
-            displayValue = (typeof value === 'number' ? value.toLocaleString() : value);
-        } else {
-            displayValue = (typeof value === 'number' ? value.toLocaleString() + '원' : value);
-        }
-        html += '<span class="mobile-card-value">' + displayValue + '</span>';
-        html += '</div>';
-        
-        // 금액 표시
         if (amountKey !== '-') {
-            html += '<div class="mobile-card-row">';
-            html += '<span class="mobile-card-label">수당</span>';
             const numAmount = typeof amount === 'number' ? amount : parseFloat(amount) || 0;
             const amountClass = numAmount < 0 ? 'amount-negative' : (numAmount > 0 ? 'amount-positive' : 'amount-zero');
-            html += '<span class="mobile-card-value ' + amountClass + '">' + (typeof amount === 'number' ? amount.toLocaleString() + '원' : amount) + '</span>';
+            
+            let displayAmount = '';
+            if (typeof amount === 'number') {
+                displayAmount = '<span class="mobile-card-value ' + amountClass + '" style="font-size: 28px; font-weight: 800;">' + amount.toLocaleString() + '원</span>';
+            } else {
+                displayAmount = '<span style="font-size: 28px; font-weight: 800;">' + amount + '</span>';
+            }
+            
+            html += '<div style="text-align: center; padding: 20px 0;">';
+            html += displayAmount;
+            html += '</div>';
+        } else {
+            let displayValue = '';
+            if (label.includes('실판') || label.includes('구간')) {
+                displayValue = (typeof value === 'number' ? value.toLocaleString() : value);
+            } else {
+                displayValue = (typeof value === 'number' ? value.toLocaleString() + '원' : value);
+            }
+            
+            html += '<div style="text-align: center; padding: 20px 0;">';
+            html += '<span class="mobile-card-value" style="font-size: 28px; font-weight: 800;">' + displayValue + '</span>';
             html += '</div>';
         }
         
         html += '</div></div>';
     });
     
-    // 지점 수당 카드 (노란색 강조)
-     const totalAmountGrade = gradeAllowance['제품Grade수당'] || 0;
+    const totalAmountGrade = gradeAllowance['제품Grade수당'] || 0;
     html += '<div class="mobile-card" style="background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%); border: 2px solid #fbc02d;">';
     html += '<div class="mobile-card-header" style="color: #f57f17;">💰 지점 수당</div>';
     html += '<div class="mobile-card-body">';
-    html += '<div class="mobile-card-row">';
-    html += '<span class="mobile-card-value" style="font-size: 20px; color: #f57f17; width: 100%; text-align: center;">' + totalAmountGrade.toLocaleString() + ' 원</span>'; 
+    html += '<div style="text-align: center; padding: 20px 0;">';
+    html += '<span class="mobile-card-value amount-positive" style="font-size: 32px; font-weight: 800; color: #f57f17;">' + totalAmountGrade.toLocaleString() + '원</span>';
     html += '</div>';
     html += '</div></div>';
     html += '</div>';
