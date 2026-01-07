@@ -458,8 +458,73 @@
                 padding: 10px 8px;
                 white-space: nowrap; /* 줄바꿈 방지 */
             }
+
+            /* ========================================
+               모바일 카드 스타일 (768px 이하에서만 표시)
+               ======================================== */
+            .mobile-card-list {
+                display: block !important; /* 모바일에서 표시 */
+            }
     
+            .desktop-only {
+                display: none !important; /* 모바일에서 테이블 숨김 */
+            }
+    
+            .mobile-card {
+                background: #ffffff;
+                border: 1px solid #e0e0e0;
+                border-radius: 12px;
+                padding: 16px;
+                margin-bottom: 12px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            }
+    
+            .mobile-card-header {
+                font-size: 15px;
+                font-weight: 600;
+                color: #1d1d1f;
+                margin-bottom: 12px;
+                padding-bottom: 8px;
+                border-bottom: 1px solid #f0f0f0;
+            }
+    
+            .mobile-card-body {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+    
+            .mobile-card-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 6px 0;
+            }
+    
+            .mobile-card-label {
+                font-size: 13px;
+                color: #666;
+                font-weight: 500;
+            }
+    
+            .mobile-card-value {
+                font-size: 14px;
+                font-weight: 600;
+                color: #1d1d1f;
+            }    
+
         }
+
+/* ========================================
+   모바일 카드 기본 스타일 (PC에서 숨김)
+   ======================================== */
+.mobile-card-list {
+    display: none; /* PC에서 기본 숨김 */
+}
+
+.desktop-only {
+    display: block; /* PC에서 테이블 표시 */
+}
 
 
 /* AI 섹션 개선 */
@@ -1895,8 +1960,6 @@
     html += renderPolicyTable(channel);
     
     html += '<h4 style="margin-top: 20px; margin-bottom: 10px; color: #555;">일시불 수당 상세</h4>';
-    html += '<div class="table-container"><table class="allowance-table">';
-    html += '<thead><tr><th>제품</th><th>수량</th><th>수당</th></tr></thead><tbody>';
    
     const lumpsumItems = [
         ['트롬 건조기', '트롬건조기_수량', '트롬건조기_수당'],
@@ -1923,6 +1986,40 @@
         ['지점 수당', '지점수량계', '지점수당']
     ];
 
+    // ========================================
+    // 모바일 카드 UI 추가
+    // ========================================
+    html += '<div class="mobile-card-list">';
+    lumpsumItems.forEach(([label, qtyKey, amountKey]) => {
+        // '수당계'나 '지점 수당' 행은 카드에서 제외
+        if (label.includes('수당계') || label === '지점 수당') {
+            return;
+        }
+    
+        const qty = lumpsum[qtyKey] || 0;
+        const amount = lumpsum[amountKey] || 0;
+    
+        html += '<div class="mobile-card">';
+        html += '<div class="mobile-card-header">' + label + '</div>';
+        html += '<div class="mobile-card-body">';
+        html += '<div class="mobile-card-row">';
+        html += '<span class="mobile-card-label">수량</span>';
+        html += '<span class="mobile-card-value">' + qty.toLocaleString() + '</span>';
+        html += '</div>';
+        html += '<div class="mobile-card-row">';
+        html += '<span class="mobile-card-label">수당</span>';
+    
+        const amountClass = amount < 0 ? 'amount-negative' : (amount > 0 ? 'amount-positive' : 'amount-zero');
+        html += '<span class="mobile-card-value ' + amountClass + '">' + amount.toLocaleString() + '원</span>';
+        html += '</div>';
+        html += '</div></div>';
+    });
+    html += '</div>';
+
+    // 데스크탑 테이블
+    html += '<div class="table-container desktop-only"><table class="allowance-table">';
+    html += '<thead><tr><th>제품</th><th>수량</th><th>수당</th></tr></thead><tbody>';
+
     lumpsumItems.forEach(([label, qtyKey, amountKey]) => {
         const qty = lumpsum[qtyKey] || 0;
         const amount = lumpsum[amountKey] || 0;
@@ -1947,8 +2044,6 @@
     
     if (subscriptionLinkage && Object.keys(subscriptionLinkage).length > 0) {
         html += '<h4 style="margin-top: 30px; margin-bottom: 10px; color: #555;">구독비중 연동 조정</h4>';
-        html += '<div class="table-container">';
-        html += '<table class="allowance-table" style="width: 100%; table-layout: fixed;">';
 
         const subscriptionLinkageItems = [
             ['구독 총판', '구독총판', '-'],
@@ -1961,6 +2056,72 @@
             ['상위구간달성수당', '상위구간달성수당', '상위구간달성수당'],
             ['현재수당比 Gap', '현재수당比Gap', '현재수당比Gap']
         ];
+
+    // ========================================
+    // 모바일 카드 UI 추가
+    // ========================================
+    html += '<div class="mobile-card-list">';
+    subscriptionLinkageItems.forEach(([label, valueKey, amountKey]) => {
+        const value = subscriptionLinkage[valueKey] || 0;
+        const amount = amountKey !== '-' ? (subscriptionLinkage[amountKey] || 0) : '-';
+        
+        html += '<div class="mobile-card">';
+        html += '<div class="mobile-card-header">' + label + '</div>';
+        html += '<div class="mobile-card-body">';
+        html += '<div class="mobile-card-row">';
+        html += '<span class="mobile-card-label">값</span>';
+        
+        // 값 표시 로직
+        let displayValue = '';
+        if (typeof value === 'string') {
+            if (value === '최대구간') {
+                displayValue = '<span style="color: #2e7d32; font-weight: 600;">최대구간</span>';
+            } else if (value === '-') {
+                displayValue = '<span style="color: #666;">-</span>';
+            } else {
+                displayValue = value;
+            }
+        } else if (label.includes('비중') || label.includes('율')) {
+            displayValue = (value * 100).toFixed(1) + '%';
+        } else {
+            displayValue = value.toLocaleString();
+        }
+        
+        html += '<span class="mobile-card-value">' + displayValue + '</span>';
+        html += '</div>';
+        
+        // 금액 표시 (해당하는 경우만)
+        if (amountKey !== '-') {
+            html += '<div class="mobile-card-row">';
+            html += '<span class="mobile-card-label">금액</span>';
+            
+            let displayAmount = '';
+            if (typeof amount === 'string') {
+                if (amount === '최대구간') {
+                    displayAmount = '<span style="color: #2e7d32; font-weight: 600;">최대구간</span>';
+                } else if (amount === '-') {
+                    displayAmount = '<span style="color: #666;">-</span>';
+                } else {
+                    displayAmount = amount;
+                }
+            } else if (amount === 0) {
+                displayAmount = '<span class="reference-text">-</span>';
+            } else {
+                const amountClass = amount < 0 ? 'amount-negative' : (amount > 0 ? 'amount-positive' : 'amount-zero');
+                displayAmount = '<span class="' + amountClass + '">' + amount.toLocaleString() + '원</span>';
+            }
+            
+            html += '<span class="mobile-card-value">' + displayAmount + '</span>';
+            html += '</div>';
+        }
+        
+        html += '</div></div>';
+    });
+    html += '</div>';
+    
+    // 데스크탑 테이블
+    html += '<div class="table-container desktop-only">';
+    html += '<table class="allowance-table" style="width: 100%; table-layout: fixed;">';
 
         html += '<thead><tr>';
         subscriptionLinkageItems.forEach(([label, valueKey, amountKey]) => {
